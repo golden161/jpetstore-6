@@ -81,7 +81,10 @@ public class OrderService {
       Map<String, Object> param = new HashMap<>(2);
       param.put("itemId", itemId);
       param.put("increment", increment);
-      itemMapper.updateInventoryQuantity(param);
+      int updated = itemMapper.updateInventoryQuantityIfAvailable(param);
+      if (updated == 0) {
+        throw new OutOfStockException(itemId);
+      }
     });
 
     orderMapper.insertOrder(order);

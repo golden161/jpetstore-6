@@ -79,4 +79,11 @@
     WHERE ITEMID = #{itemId}
   </update>
 
+  <update id="updateInventoryQuantityIfAvailable">
+    UPDATE INVENTORY SET
+      QTY = QTY - #{increment}
+    WHERE ITEMID = #{itemId}
+      AND QTY &gt;= #{increment}
+  </update>
+
 </mapper>

@@ -17,7 +17,9 @@ package org.mybatis.jpetstore.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -192,13 +194,38 @@ class OrderServiceTest {
 
     // when
     when(sequenceMapper.getSequence(any())).thenReturn(orderNumSequence);
+    when(itemMapper.updateInventoryQuantityIfAvailable(expectedItemParam)).thenReturn(1);
     orderService.insertOrder(order);
 
     // then
     verify(orderMapper).insertOrder(argThat(v -> v == order && v.getOrderId() == 100));
     verify(orderMapper).insertOrderStatus(eq(order));
     verify(lineItemMapper).insertLineItem(argThat(v -> v == item && v.getOrderId() == 100));
-    verify(itemMapper).updateInventoryQuantity(eq(expectedItemParam));
+    verify(itemMapper).updateInventoryQuantityIfAvailable(eq(expectedItemParam));
+  }
+
+  @Test
+  void shouldThrowOutOfStockAndNotPersistWhenInventoryInsufficient() {
+    // given
+    Order order = new Order();
+    LineItem item = new LineItem();
+    String itemId = "EST-1";
+    item.setItemId(itemId);
+    item.setQuantity(999999);
+    order.addLineItem(item);
+
+    Sequence orderNumSequence = new Sequence("ordernum", 100);
+
+    // when
+    when(sequenceMapper.getSequence(any())).thenReturn(orderNumSequence);
+    when(itemMapper.updateInventoryQuantityIfAvailable(any())).thenReturn(0);
+
+    // then
+    OutOfStockException ex = assertThrows(OutOfStockException.class, () -> orderService.insertOrder(order));
+    assertThat(ex.getItemId()).isEqualTo(itemId);
+    verify(orderMapper, never()).insertOrder(any());
+    verify(orderMapper, never()).insertOrderStatus(any());
+    verify(lineItemMapper, never()).insertLineItem(any());
   }
 
 }
