@@ -10,3 +10,6 @@
 *.properties
 .env
 .github/keys/
+
+# macOS
+.DS_Store
