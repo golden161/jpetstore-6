@@ -28,19 +28,6 @@ import org.mybatis.jpetstore.domain.Item;
 public interface ItemMapper {
 
   /**
-   * Unconditionally decrements inventory, allowing the quantity to go negative.
-   *
-   * @param param
-   *          map carrying {@code itemId} and {@code increment}
-   *
-   * @deprecated since B4. Prefer {@link #updateInventoryQuantityIfAvailable(Map)}, which refuses to oversell. Retained
-   *             (with its characterization test) only until the follow-up milestone removes it per the B4 ticket, step
-   *             4.
-   */
-  @Deprecated
-  void updateInventoryQuantity(Map<String, Object> param);
-
-  /**
    * Conditionally decrements inventory, only when enough stock is on hand.
    *
    * @param param

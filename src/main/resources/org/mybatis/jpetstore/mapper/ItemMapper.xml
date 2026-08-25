@@ -73,12 +73,6 @@
     WHERE ITEMID = #{itemId}
   </select>
 
-  <update id="updateInventoryQuantity">
-    UPDATE INVENTORY SET
-      QTY = QTY - #{increment}
-    WHERE ITEMID = #{itemId}
-  </update>
-
   <update id="updateInventoryQuantityIfAvailable">
     UPDATE INVENTORY SET
       QTY = QTY - #{increment}
