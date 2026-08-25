@@ -85,8 +85,12 @@ jobs:
           for i in $(seq 1 48); do
             sleep 5
 
+            # Consider the server ready only when the jpetstore app actually serves its landing
+            # page (a 2xx response whose body carries the real <title>), not merely when the port
+            # answers. `curl -f` drops the body of Payara's in-deploy HTTP 500 "Error report", and
+            # the grep guards against a 200 error page, so the E2E tests never start too early.
             # Target 127.0.0.1 to avoid IPv6 loopback resolution mismatches to jpetstore context path
-            if curl -s --max-time 2 http://127.0.0.1:8080/jpetstore/ > /dev/null; then
+            if curl -fsSL --max-time 5 http://127.0.0.1:8080/jpetstore/ 2>/dev/null | grep -q "JPetStore Demo"; then
               echo "Server ready after $((i * 5))s"
               SERVER_READY=true
               break
