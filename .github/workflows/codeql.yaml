@@ -15,6 +15,9 @@ concurrency:
 jobs:
   analyze:
     name: Analyze
+    # Skip on forks: a private fork lacks code scanning (GitHub Advanced Security),
+    # so the analyze/upload step fails on every run. Run only on the upstream repo.
+    if: github.repository == 'mybatis/jpetstore-6'
     runs-on: 'ubuntu-latest'
     timeout-minutes: 30
     permissions:
