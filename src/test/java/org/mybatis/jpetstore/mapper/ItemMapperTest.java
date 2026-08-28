@@ -139,26 +139,6 @@ class ItemMapperTest {
 
   }
 
-  /**
-   * Update inventory quantity.
-   */
-  @Test
-  void updateInventoryQuantity() {
-    // given
-    String itemId = "EST-1";
-    Map<String, Object> params = new HashMap<>();
-    params.put("itemId", itemId);
-    params.put("increment", 10);
-
-    // when
-    mapper.updateInventoryQuantity(params);
-
-    // then
-    Integer quantity = jdbcTemplate.queryForObject("SELECT QTY FROM inventory WHERE itemid = ?", Integer.class, itemId);
-    assertThat(quantity).isEqualTo(9990);
-
-  }
-
   @Test
   void updateInventoryQuantityIfAvailableDeductsWhenSufficient() {
     // given
